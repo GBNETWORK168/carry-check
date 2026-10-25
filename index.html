@@ -1,0 +1,111 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#fff4e6"><title>帶得過嗎？CarryCheck 入境攜帶查詢</title>
+<style>
+:root{--cream:#fff7ec;--card:#fffdf8;--coral:#ff7a5c;--coral2:#ffb199;--ink:#4a3a33;--mute:#9b8579;--ok:#2fae7a;--cond:#f0a020;--no:#e5484d;--ask:#7a83d6}
+*{box-sizing:border-box}body{margin:0;background:var(--cream);color:var(--ink);font-family:-apple-system,"PingFang TC","Noto Sans TC",sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:480px;margin:0 auto;padding:0 16px 32px}
+header{position:relative;height:170px;overflow:hidden;background:linear-gradient(#ffe9d6,#fff7ec);border-radius:0 0 28px 28px}
+header h1{position:absolute;left:18px;top:14px;margin:0;font-size:22px;letter-spacing:1px}header h1 small{display:block;font-size:12px;color:var(--mute);font-weight:500}
+.plane{position:absolute;top:66px;left:-80px;animation:fly 9s linear infinite;will-change:transform}
+@keyframes fly{to{transform:translateX(620px) translateY(-14px)}}
+.cloud{position:absolute;background:#fff;border-radius:20px;height:16px;opacity:.9;animation:drift 22s linear infinite}
+@keyframes drift{from{transform:translateX(420px)}to{transform:translateX(-120px)}}
+.belt{position:absolute;bottom:14px;left:0;right:0;height:16px;background:repeating-linear-gradient(90deg,#c9b2a3 0 18px,#b89e8e 18px 20px);animation:roll .8s linear infinite;border-top:3px solid #8f7566}
+@keyframes roll{to{background-position:20px 0}}
+.bags{position:absolute;bottom:30px;left:0;width:200%;display:flex;gap:70px;animation:move 10s linear infinite;will-change:transform}
+@keyframes move{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.bag{width:44px;height:34px;border-radius:9px;position:relative;flex:none}.bag:before{content:"";position:absolute;top:-8px;left:13px;width:16px;height:9px;border:3px solid #8f7566;border-bottom:0;border-radius:6px 6px 0 0}
+.bag i{position:absolute;top:9px;left:9px;width:5px;height:5px;border-radius:50%;background:#4a3a33;box-shadow:20px 0 #4a3a33}.bag b{position:absolute;top:18px;left:17px;width:10px;height:5px;border-radius:0 0 6px 6px;background:#c0392b}
+.card{background:var(--card);border-radius:22px;padding:16px;margin-top:14px;box-shadow:0 4px 16px rgba(160,100,70,.08)}
+.dir{display:flex;align-items:center;gap:8px}.dir select{flex:1;appearance:none;-webkit-appearance:none;border:2px solid #ffe0d2;background:#fff;border-radius:14px;padding:11px;font-size:16px;color:var(--ink);text-align:center}
+.swap{border:0;background:var(--coral);color:#fff;width:40px;height:40px;border-radius:50%;font-size:18px}
+.tabs{display:flex;background:#ffeee4;border-radius:16px;padding:4px;margin-top:14px}.tabs button{flex:1;border:0;background:none;padding:10px;border-radius:12px;font-size:15px;color:var(--mute)}.tabs .on{background:#fff;color:var(--coral);font-weight:700;box-shadow:0 2px 6px rgba(0,0,0,.05)}
+input[type=search]{width:100%;border:2px solid #ffe0d2;border-radius:14px;padding:12px 14px;font-size:16px;background:#fff;color:var(--ink)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.chips button{border:0;background:#fff1ea;color:#c75a40;padding:7px 12px;border-radius:99px;font-size:14px}
+.btn{display:block;width:100%;border:0;background:var(--coral);color:#fff;font-size:16px;font-weight:700;padding:14px;border-radius:16px;margin-top:10px}.btn.ghost{background:#fff1ea;color:#c75a40}
+.note{font-size:12.5px;color:var(--mute);line-height:1.6;margin:8px 0 0}
+.res{animation:pop .35s ease}@keyframes pop{from{opacity:0;transform:translateY(8px)}}
+.badge{display:inline-block;padding:7px 14px;border-radius:99px;color:#fff;font-weight:800;font-size:16px}
+.v-ok{background:var(--ok)}.v-cond{background:var(--cond)}.v-no{background:var(--no)}.v-ask{background:var(--ask)}
+.res h2{margin:12px 0 2px;font-size:21px}.cat{font-size:13px;color:var(--mute)}
+.sec{margin-top:12px;font-size:14.5px;line-height:1.7}.sec b{display:block;font-size:12.5px;color:var(--coral);margin-bottom:2px}
+.pen{background:#fff2f0;border-radius:12px;padding:10px 12px}
+.src a{display:block;color:#c75a40;font-size:13.5px;margin-top:4px;word-break:break-all}
+mark{background:#ffd3c4;color:#a2311a;border-radius:4px;padding:0 2px}
+.ocrtxt{max-height:160px;overflow:auto;background:#fff8f2;border-radius:12px;padding:10px;font-size:13px;white-space:pre-wrap;margin-top:8px}
+.prog{height:8px;background:#ffeee4;border-radius:9px;overflow:hidden;margin-top:10px}.prog i{display:block;height:100%;width:0;background:var(--coral);transition:width .3s}
+img.pv{width:100%;border-radius:14px;margin-top:10px;max-height:220px;object-fit:contain;background:#fff}
+footer{text-align:center;font-size:11.5px;color:var(--mute);margin-top:22px;line-height:1.6}
+.hidden{display:none}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style></head><body>
+<header aria-hidden="false">
+<h1>帶得過嗎？✈️<small>出國帶東西，入境前查一下</small></h1>
+<div class="cloud" style="top:40px;width:60px"></div><div class="cloud" style="top:70px;width:44px;animation-delay:-9s"></div>
+<svg class="plane" width="70" height="34" viewBox="0 0 70 34" aria-hidden="true"><path d="M4 18 L58 14 Q68 14 66 19 Q64 22 56 22 L10 22 Z" fill="#fff" stroke="#ff7a5c" stroke-width="2"/><path d="M28 18 L40 2 L46 2 L40 18Z M10 18 L6 8 L12 8 L18 18Z" fill="#ff7a5c"/><circle cx="50" cy="18" r="1.6" fill="#4a3a33"/><circle cx="44" cy="18" r="1.6" fill="#4a3a33"/></svg>
+<div class="bags"><div class="bag" style="background:#ffb199"><i></i><b></b></div><div class="bag" style="background:#8fd3c1"><i></i><b></b></div><div class="bag" style="background:#ffd479"><i></i><b></b></div><div class="bag" style="background:#b8b5f0"><i></i><b></b></div><div class="bag" style="background:#ffb199"><i></i><b></b></div><div class="bag" style="background:#8fd3c1"><i></i><b></b></div><div class="bag" style="background:#ffd479"><i></i><b></b></div><div class="bag" style="background:#b8b5f0"><i></i><b></b></div></div>
+<div class="belt"></div>
+</header>
+<div class="wrap">
+<div class="card"><div class="dir">
+<select id="from" aria-label="出發地"><option value="TW">🇹🇼 台灣</option><option value="JP">🇯🇵 日本</option></select>
+<button class="swap" id="swap" aria-label="交換">⇄</button>
+<select id="to" aria-label="目的地"><option value="JP">🇯🇵 日本</option><option value="TW">🇹🇼 台灣</option></select>
+</div><p class="note" id="dirnote"></p>
+<div class="tabs"><button id="t1" class="on">🔎 搜尋物品</button><button id="t2">📷 拍成分表</button></div></div>
+
+<div class="card" id="p1"><input type="search" id="q" placeholder="輸入物品，例如：泡麵、牛肉乾、行動電源" enterkeyhint="search">
+<div class="chips" id="chips"></div></div>
+
+<div class="card hidden" id="p2">
+<p class="note" style="margin-top:0">📌 這裡<b>不是</b>用 AI 辨識物品，而是在你的手機上用 OCR 讀取<b>包裝背面的成分表（原材料名）</b>，找出肉類、肉精、蛋等關鍵字。請拍清楚、平整、光線充足的成分表。照片不會上傳。</p>
+<label class="btn" for="file">📷 拍照或上傳成分表</label><input id="file" type="file" accept="image/*" class="hidden">
+<img id="pv" class="pv hidden" alt="預覽"><div class="prog hidden" id="prog"><i></i></div><p class="note" id="ostat"></p></div>
+
+<div id="out"></div>
+<footer>查詢結果僅供參考，實際規定以各國官方公告及現場檢疫/海關人員判定為準。<br>有疑問請入境時走紅線（應申報）或至檢疫櫃台申報。</footer>
+</div>
+<script src="rules.js"></script>
+<script>
+const $=s=>document.querySelector(s);const VL={ok:"可攜帶",cond:"有條件",no:"不可攜帶入境",ask:"建議申報或洽詢"};
+const esc=s=>s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+function dir(){return $("#from").value+">"+$("#to").value}
+function syncDir(changed){const f=$("#from"),t=$("#to");if(f.value===t.value){(changed==="from"?t:f).value=f.value==="TW"?"JP":"TW"}
+$("#dirnote").textContent=dir()==="TW>JP"?"依日本入境規定判定（動物検疫所、植物防疫所、日本税關）":"依台灣入境規定判定（防檢署、關務署）";$("#out").innerHTML=""}
+$("#from").onchange=()=>syncDir("from");$("#to").onchange=()=>syncDir("to");
+$("#swap").onclick=()=>{const a=$("#from").value;$("#from").value=$("#to").value;$("#to").value=a;syncDir()};
+function ruleFor(it){const d=dir();if(it.both)return it.both;if(d==="TW>JP")return it.jp;return it.tw||it.jpout}
+function card(name,cat,r,extra){const s=(r.s||[]).map(k=>`<a href="${SRC[k].u}" target="_blank" rel="noopener">🔗 ${SRC[k].t}</a>`).join("");
+return `<div class="card res" data-v="${r.v}"><span class="badge v-${r.v}">${VL[r.v]}</span><h2>${esc(name)}</h2><div class="cat">分類：${esc(cat)}　·　${dir()==="TW>JP"?"台灣 → 日本":"日本 → 台灣"}</div>${extra||""}
+<div class="sec"><b>原因</b>${r.r}</div>${r.p?`<div class="sec pen"><b>罰則</b>${r.p}</div>`:""}<div class="sec src"><b>官方來源</b>${s}</div></div>`}
+function search(q){q=q.trim().toLowerCase();if(!q){$("#out").innerHTML="";return}
+let hits=ITEMS.filter(it=>it.name.toLowerCase().includes(q)||it.kw.some(k=>k.toLowerCase().includes(q)||q.includes(k.toLowerCase())));
+// 「泡麵」單獨搜尋時，含肉版本排第一
+hits.sort((a,b)=>(b.kw.some(k=>k.toLowerCase()===q)?1:0)-(a.kw.some(k=>k.toLowerCase()===q)?1:0));
+hits=hits.filter(it=>ruleFor(it));
+if(!hits.length){$("#out").innerHTML=card(q,"未收錄",{v:"ask",r:"資料庫中找不到此物品的明確官方規定，本工具不會猜測。建議入境時走紅線（應申報）或洽詢檢疫/海關單位。",s:dir()==="TW>JP"?["jp_meat","jp_plant","jp_cus"]:["tw_aphia","tw_entry"]});return}
+$("#out").innerHTML=hits.slice(0,3).map(it=>card(it.name,it.cat,ruleFor(it))).join("")}
+let tm;$("#q").oninput=e=>{clearTimeout(tm);tm=setTimeout(()=>search(e.target.value),200)};
+["泡麵","牛肉乾","水果","藥品","行動電源","電子煙","酒","菸","油飯","咖哩調理包","蛋","乳製品","禮品蓋印","鳳梨酥","免稅"].forEach(c=>{const b=document.createElement("button");b.textContent=c;b.onclick=()=>{$("#q").value=c;search(c)};$("#chips").appendChild(b)});
+$("#t1").onclick=()=>{$("#t1").className="on";$("#t2").className="";$("#p1").classList.remove("hidden");$("#p2").classList.add("hidden")};
+$("#t2").onclick=()=>{$("#t2").className="on";$("#t1").className="";$("#p2").classList.remove("hidden");$("#p1").classList.add("hidden")};
+// OCR
+function analyze(raw){let t=raw;OCR_EXCLUDE.forEach(w=>t=t.split(w).join("　".repeat(w.length)));const norm=t.replace(/[ \t]/g,"");const low=norm.toLowerCase();
+const find=list=>{const f=new Set();list.slice().sort((a,b)=>b.length-a.length).forEach(w=>{if(low.includes(w.toLowerCase()))f.add(w)});const a=[...f];return a.filter(w=>!a.some(o=>o!==w&&o.toLowerCase().includes(w.toLowerCase())))};
+const ex=find(OCR_EXTRACT),so=find(OCR_SOLID),eg=find(OCR_EGG);return{ex,so,eg,text:norm}}
+function hl(text,words){if(!words.length)return esc(text);const re=new RegExp("("+words.sort((a,b)=>b.length-a.length).map(w=>w.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")).join("|")+")","gi");return esc(text).replace(re,"<mark>$1</mark>")}
+function ocrResult(raw){const a=analyze(raw),meat=[...new Set([...a.ex,...a.so])],all=[...meat,...a.eg],tw=dir()!=="TW>JP";let r;
+if(meat.length){r=tw?{v:"no",r:"成分表中讀到肉類／肉精相關字詞："+meat.join("、")+"。已辨識為肉類或含肉製品，煮熟、乾燥、真空包裝、少量自用都不能免除檢疫限制。（例外：高溫滅菌罐頭/軟罐頭，請洽防檢署）",p:TW_MEAT_PEN,s:["tw_noodle","tw_meat"]}
+:{v:"cond",r:"成分表中讀到肉類／肉精相關字詞："+meat.join("、")+"。日本 2026/7/1 起，杯麵乾燥配料、肉精、調味料、殺菌調理包等若符合「指定外基準」可能可帶；但肉乾、火腿、香腸等肉製品不可。請保留包裝並於動物檢疫櫃台申報。",p:JP_MEAT_PEN,s:["jp_shiteigai","jp_meat"]}}
+else if(a.eg.length){r=tw?{v:"ask",r:"成分表讀到蛋相關字詞："+a.eg.join("、")+"，未讀到肉類。含蛋加工食品是否需檢疫依品項而定，建議申報或洽詢防檢署。",s:["tw_aphia"]}:{v:"cond",r:"成分表讀到蛋相關字詞："+a.eg.join("、")+"。蛋已完全凝固的加工品（蛋糕、餅乾等）或蛋非最主要原料者，可能屬指定外基準41/42。",s:["jp_shiteigai"]}}
+else r={v:"ask",r:"沒有在讀到的文字中找到肉、肉精或蛋的關鍵字。但 OCR 可能漏字，請再次核對成分表；若為水果、植物或其他物品，請改用「搜尋物品」。",s:tw?["tw_entry"]:["jp_meat"]};
+$("#out").innerHTML=card("成分表判讀結果","依成分表文字判斷（非物品辨識）",r,`<div class="sec"><b>讀到的文字（標示命中字詞）</b><div class="ocrtxt">${hl(a.text,all)}</div></div>`);return r}
+let tessLoaded=null;function loadTess(){return tessLoaded||(tessLoaded=new Promise((ok,no)=>{const s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";s.onload=ok;s.onerror=()=>{tessLoaded=null;no(new Error("load"))};document.head.appendChild(s)}))}
+async function runOCR(file){const pv=$("#pv");pv.src=URL.createObjectURL(file);pv.classList.remove("hidden");$("#prog").classList.remove("hidden");const bar=$("#prog i"),st=$("#ostat");
+try{st.textContent="載入文字辨識引擎（第一次約需下載 10–20MB，請稍候）…";await loadTess();
+const res=await Tesseract.recognize(file,"jpn+chi_tra+eng",{logger:m=>{if(m.progress!=null){bar.style.width=Math.round(m.progress*100)+"%";st.textContent=(m.status==="recognizing text"?"辨識文字中… ":"準備中… ")+Math.round(m.progress*100)+"%"}}});
+bar.style.width="100%";st.textContent="辨識完成 ✔";ocrResult(res.data.text)}catch(e){st.textContent="辨識失敗，請確認網路連線後再試一次，或改用「搜尋物品」。";console.warn(e)}}
+$("#file").onchange=e=>{const f=e.target.files[0];if(f)runOCR(f)};
+window.__test={search,ocrResult,runOCR};syncDir();
+</script></body></html>
