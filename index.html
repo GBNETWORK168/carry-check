@@ -87,7 +87,7 @@ hits=hits.filter(it=>ruleFor(it));
 if(!hits.length){$("#out").innerHTML=card(q,"未收錄",{v:"ask",r:"資料庫中找不到此物品的明確官方規定，本工具不會猜測。建議入境時走紅線（應申報）或洽詢檢疫/海關單位。",s:dir()==="TW>JP"?["jp_meat","jp_plant","jp_cus"]:["tw_aphia","tw_entry"]});return}
 $("#out").innerHTML=hits.slice(0,3).map(it=>card(it.name,it.cat,ruleFor(it))).join("")}
 let tm;$("#q").oninput=e=>{clearTimeout(tm);tm=setTimeout(()=>search(e.target.value),200)};
-["泡麵","牛肉乾","水果","藥品","行動電源","電子煙","酒","菸","油飯","咖哩調理包","蛋","乳製品","禮品蓋印","鳳梨酥","免稅"].forEach(c=>{const b=document.createElement("button");b.textContent=c;b.onclick=()=>{$("#q").value=c;search(c)};$("#chips").appendChild(b)});
+["泡麵","牛肉乾","水果","藥品","行動電源","電子煙","酒","菸","油飯","咖哩調理包","蛋","乳製品","鳳梨酥","免稅"].forEach(c=>{const b=document.createElement("button");b.textContent=c;b.onclick=()=>{$("#q").value=c;search(c)};$("#chips").appendChild(b)});
 $("#t1").onclick=()=>{$("#t1").className="on";$("#t2").className="";$("#p1").classList.remove("hidden");$("#p2").classList.add("hidden")};
 $("#t2").onclick=()=>{$("#t2").className="on";$("#t1").className="";$("#p2").classList.remove("hidden");$("#p1").classList.add("hidden")};
 // OCR
