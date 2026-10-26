@@ -38,6 +38,11 @@ mark{background:#ffd3c4;color:#a2311a;border-radius:4px;padding:0 2px}
 img.pv{width:100%;border-radius:14px;margin-top:10px;max-height:220px;object-fit:contain;background:#fff}
 footer{text-align:center;font-size:11.5px;color:var(--mute);margin-top:22px;line-height:1.6}
 .hidden{display:none}
+.concl{font-size:22px;font-weight:800;line-height:1.4;padding:12px 14px;border-radius:16px;margin-bottom:8px}
+.c-ok{background:#e3f6ee;color:#1d7a54}.c-no{background:#fde7e8;color:#b3262b}.c-cond{background:#fff1d9;color:#9a5a00}.c-ask{background:#eceefb;color:#454e9e}
+.todo{font-size:16px;line-height:1.6;margin:4px 0 6px}
+details.more{margin-top:10px;font-size:13.5px}details.more summary{color:var(--coral);font-weight:700;cursor:pointer;padding:6px 0}
+details.more .sec{font-size:13.5px}.tips{margin:6px 0 0;padding-left:20px;font-size:15px;line-height:1.7}
 @media (prefers-reduced-motion:reduce){*{animation:none!important}}
 </style></head><body>
 <header aria-hidden="false">
@@ -76,9 +81,13 @@ $("#dirnote").textContent=dir()==="TW>JP"?"依日本入境規定判定（動物�
 $("#from").onchange=()=>syncDir("from");$("#to").onchange=()=>syncDir("to");
 $("#swap").onclick=()=>{const a=$("#from").value;$("#from").value=$("#to").value;$("#to").value=a;syncDir()};
 function ruleFor(it){const d=dir();if(it.both)return it.both;if(d==="TW>JP")return it.jp;return it.tw||it.jpout}
-function card(name,cat,r,extra){const s=(r.s||[]).map(k=>`<a href="${SRC[k].u}" target="_blank" rel="noopener">🔗 ${SRC[k].t}</a>`).join("");
-return `<div class="card res" data-v="${r.v}"><span class="badge v-${r.v}">${VL[r.v]}</span><h2>${esc(name)}</h2><div class="cat">分類：${esc(cat)}　·　${dir()==="TW>JP"?"台灣 → 日本":"日本 → 台灣"}</div>${extra||""}
-<div class="sec"><b>原因</b>${r.r}</div>${r.p?`<div class="sec pen"><b>罰則</b>${r.p}</div>`:""}<div class="sec src"><b>官方來源</b>${s}</div></div>`}
+const DEST=()=>dir()==="TW>JP"?"日本":"台灣";
+function defC(r){const d=DEST();return {ok:"✅ 可以帶",no:"❌ 不能帶入"+d,cond:"⚠️ 有條件可以帶",ask:"❓ 無法確定，建議入境時申報"}[r.v]}
+function defD(r){const d=DEST();return {ok:"可以放心放進行李。",no:"請不要帶，出發前吃掉或丟掉；被查到會沒收並可能重罰。",cond:"要符合下方條件才行；不確定就入境時走紅線、主動申報。",ask:"本工具找不到明確規定。入境時走紅線或到檢疫櫃台問，最安全。"}[r.v]}
+function card(name,cat,r,extra,top){const s=(r.s||[]).map(k=>`<a href="${SRC[k].u}" target="_blank" rel="noopener">🔗 ${SRC[k].t}</a>`).join("");
+return `<div class="card res" data-v="${r.v}"><div class="concl c-${r.v}">${r.c||defC(r)}</div><p class="todo">${r.d||defD(r)}</p>${top||""}<div class="cat">${esc(name)}　·　${dir()==="TW>JP"?"台灣 → 日本":"日本 → 台灣"}</div>
+<details class="more"><summary>看詳細原因、罰則、官方來源</summary><span class="badge v-${r.v}">${VL[r.v]}</span><div class="cat">分類：${esc(cat)}</div>${extra||""}
+${r.r?`<div class="sec"><b>原因</b>${r.r}</div>`:""}${r.p?`<div class="sec pen"><b>罰則</b>${r.p}</div>`:""}${s?`<div class="sec src"><b>官方來源</b>${s}</div>`:""}</details></div>`}
 function search(q){q=q.trim().toLowerCase();if(!q){$("#out").innerHTML="";return}
 let hits=ITEMS.filter(it=>it.name.toLowerCase().includes(q)||it.kw.some(k=>k.toLowerCase().includes(q)||q.includes(k.toLowerCase())));
 // 「泡麵」單獨搜尋時，含肉版本排第一
@@ -91,21 +100,38 @@ let tm;$("#q").oninput=e=>{clearTimeout(tm);tm=setTimeout(()=>search(e.target.va
 $("#t1").onclick=()=>{$("#t1").className="on";$("#t2").className="";$("#p1").classList.remove("hidden");$("#p2").classList.add("hidden")};
 $("#t2").onclick=()=>{$("#t2").className="on";$("#t1").className="";$("#p2").classList.remove("hidden");$("#p1").classList.add("hidden")};
 // OCR
-function analyze(raw){let t=raw;OCR_EXCLUDE.forEach(w=>t=t.split(w).join("　".repeat(w.length)));const norm=t.replace(/[ \t]/g,"");const low=norm.toLowerCase();
-const find=list=>{const f=new Set();list.slice().sort((a,b)=>b.length-a.length).forEach(w=>{if(low.includes(w.toLowerCase()))f.add(w)});const a=[...f];return a.filter(w=>!a.some(o=>o!==w&&o.toLowerCase().includes(w.toLowerCase())))};
-const ex=find(OCR_EXTRACT),so=find(OCR_SOLID),eg=find(OCR_EGG);return{ex,so,eg,text:norm}}
+const CJK=/[\u3041-\u3096\u30a1-\u30fa\u4e00-\u9fff]/g;
+function quality(raw,conf){const t=raw.replace(/\s+/g," ");const cjk=(t.match(CJK)||[]).length;
+const head=/原材料|原料|成分|成份|配料|内容量|名称|品名/.test(raw.replace(/\s/g,""));
+const toks=raw.split(/[\s、，,。.:：;；()（）\[\]【】・/／*]+/).filter(x=>x);let good=0,tot=0;
+toks.forEach(w=>{const n=w.replace(/ー/g,"").length;tot+=n;const c=(w.match(CJK)||[]).length;const junk=(w.match(/[a-z0-9]/gi)||[]).length;if(c>=2&&c>=junk*2&&!/ーー/.test(w))good+=n});
+const ratio=tot?good/tot:0;let ok=cjk>=15&&ratio>=0.5&&(head||good>=30);if(conf!=null&&conf<(head?45:60))ok=false;
+return{ok,conf,cjk,ratio:+ratio.toFixed(2),head}}
+function analyze(raw){let t=raw;OCR_EXCLUDE.forEach(w=>t=t.split(w).join("　".repeat(w.length)));const norm=t.replace(/[ \t]/g,"");
+const find=list=>{const f=[];list.forEach(p=>{const re=p instanceof RegExp?new RegExp(p.source,"gi"):new RegExp(p.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),"gi");(norm.match(re)||[]).forEach(m=>f.push(m))});const a=[...new Set(f)];return a.filter(w=>!a.some(o=>o!==w&&o.toLowerCase().includes(w.toLowerCase())))};
+return{pr:find(OCR_PRODUCT),ex:find(OCR_EXTRACT),so:find(OCR_SOLID),eg:find(OCR_EGG),text:norm}}
 function hl(text,words){if(!words.length)return esc(text);const re=new RegExp("("+words.sort((a,b)=>b.length-a.length).map(w=>w.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")).join("|")+")","gi");return esc(text).replace(re,"<mark>$1</mark>")}
-function ocrResult(raw){const a=analyze(raw),meat=[...new Set([...a.ex,...a.so])],all=[...meat,...a.eg],tw=dir()!=="TW>JP";let r;
-if(meat.length){r=tw?{v:"no",r:"成分表中讀到肉類／肉精相關字詞："+meat.join("、")+"。已辨識為肉類或含肉製品，煮熟、乾燥、真空包裝、少量自用都不能免除檢疫限制。（例外：高溫滅菌罐頭/軟罐頭，請洽防檢署）",p:TW_MEAT_PEN,s:["tw_noodle","tw_meat"]}
-:{v:"cond",r:"成分表中讀到肉類／肉精相關字詞："+meat.join("、")+"。日本 2026/7/1 起，杯麵乾燥配料、肉精、調味料、殺菌調理包等若符合「指定外基準」可能可帶；但肉乾、火腿、香腸等肉製品不可。請保留包裝並於動物檢疫櫃台申報。",p:JP_MEAT_PEN,s:["jp_shiteigai","jp_meat"]}}
-else if(a.eg.length){r=tw?{v:"ask",r:"成分表讀到蛋相關字詞："+a.eg.join("、")+"，未讀到肉類。含蛋加工食品是否需檢疫依品項而定，建議申報或洽詢防檢署。",s:["tw_aphia"]}:{v:"cond",r:"成分表讀到蛋相關字詞："+a.eg.join("、")+"。蛋已完全凝固的加工品（蛋糕、餅乾等）或蛋非最主要原料者，可能屬指定外基準41/42。",s:["jp_shiteigai"]}}
-else r={v:"ask",r:"沒有在讀到的文字中找到肉、肉精或蛋的關鍵字。但 OCR 可能漏字，請再次核對成分表；若為水果、植物或其他物品，請改用「搜尋物品」。",s:tw?["tw_entry"]:["jp_meat"]};
-$("#out").innerHTML=card("成分表判讀結果","依成分表文字判斷（非物品辨識）",r,`<div class="sec"><b>讀到的文字（標示命中字詞）</b><div class="ocrtxt">${hl(a.text,all)}</div></div>`);return r}
+const RETAKE=`<ul class="tips"><li>把包裝<b>壓平</b>，只拍「原材料名／成分」那一塊，讓字<b>塞滿畫面</b></li><li>在<b>明亮</b>的地方拍，避開燈光<b>反光</b></li><li>手<b>拿穩</b>，對焦清楚再按快門</li><li>還是不行：改用上方「🔎 搜尋物品」輸入品名（例如：泡麵）</li></ul>`;
+function ocrResult(raw,conf){const q=quality(raw,conf),a=analyze(raw),meat=(m=>m.filter(w=>!m.some(o=>o!==w&&o.toLowerCase().includes(w.toLowerCase()))))([...new Set([...a.pr,...a.ex,...a.so])]),all=[...meat,...a.eg],tw=dir()!=="TW>JP";let r,top="";
+const txt=`<div class="sec"><b>讀到的文字（標示命中字詞）</b><div class="ocrtxt">${hl(a.text,q.ok?all:[])}</div></div><div class="note">辨識品質：${conf!=null?"信心度 "+Math.round(conf)+"、":""}可讀字比例 ${Math.round(q.ratio*100)}%${q.head?"、有找到成分標題":""}</div>`;
+if(!q.ok){r={v:"ask",c:"❓ 照片的字讀不清楚，無法判斷",d:"這次讀到的大多是亂碼，所以<b>不能</b>用它來判斷能不能帶。請照下面方式重拍，或改用「搜尋物品」。",r:"",s:[]};top=RETAKE}
+else if(meat.length){const m=meat.join("、");
+ if(tw)r={v:"no",c:"❌ 不能帶入台灣",d:"成分裡有肉或肉精（"+esc(m)+"）。含肉製品（包括含肉泡麵）就算煮熟、真空包裝、自己吃都不能帶，請出發前吃掉或丟掉。",r:"成分表中讀到肉類／肉精相關字詞："+m+"。已辨識為肉類或含肉製品，煮熟、乾燥、真空包裝、少量自用都不能免除檢疫限制。（例外：高溫滅菌罐頭/軟罐頭，請洽防檢署）",p:TW_MEAT_PEN,s:["tw_noodle","tw_meat"]};
+ else if(a.pr.length)r={v:"no",c:"❌ 不能帶入日本",d:"這看起來是肉製品（"+esc(a.pr.join("、"))+"）。肉乾、火腿、香腸、培根等沒有輸出國檢查證明書不能帶進日本，伴手禮、自用也一樣。",r:"成分表中讀到："+m+"。",p:JP_MEAT_PEN,s:["jp_meat"]};
+ else r={v:"cond",c:"⚠️ 可以帶，但入境時要到動物檢疫櫃台申報、保留包裝",d:"成分有肉精或肉類配料（"+esc(m)+"）。日本 2026/7/1 起，杯麵（加熱水即可吃）的乾燥配料、肉精、調味料等符合「指定外基準」可以帶；<b>請帶著包裝到「動物検疫」櫃台申報</b>。如果是肉乾、香腸、火腿這類肉製品，則不能帶。",r:"成分表中讀到肉類／肉精相關字詞："+m+"。日本 2026/7/1 起，杯麵乾燥配料、肉精、調味料、殺菌調理包等若符合「指定外基準」可能可帶；但肉乾、火腿、香腸等肉製品不可。需用鍋煮的袋裝麵若配料含肉則不可。",p:JP_MEAT_PEN,s:["jp_shiteigai","jp_meat"]}}
+else if(a.eg.length){r=tw?{v:"ask",c:"❓ 有蛋，建議入境時申報",d:"沒讀到肉，但有蛋（"+esc(a.eg.join("、"))+"）。含蛋加工食品要不要檢疫依品項而定，入境時走紅線或到檢疫櫃台問最安全。",r:"成分表讀到蛋相關字詞："+a.eg.join("、")+"，未讀到肉類。",s:["tw_aphia"]}
+ :{v:"cond",c:"⚠️ 大多可以帶（含蛋），不確定就申報",d:"沒讀到肉，但有蛋（"+esc(a.eg.join("、"))+"）。蛋已完全煮熟凝固的加工品（蛋糕、餅乾等）或蛋不是主要原料的，通常可以帶；不確定就到動物檢疫櫃台問。",r:"成分表讀到蛋相關字詞："+a.eg.join("、")+"。蛋已完全凝固的加工品或蛋非最主要原料者，可能屬指定外基準41/42。",s:["jp_shiteigai"]}}
+else r={v:"ok",c:"✅ 沒看到肉、肉精或蛋，應該可以帶",d:"請自己再看一眼成分表確認沒有肉（照片辨識可能漏字）。如果是水果、植物、藥品等，請改用「搜尋物品」。",r:"沒有在讀到的文字中找到肉、肉精或蛋的關鍵字。不含肉、蛋等動物成分的食品非動物檢疫物。",s:tw?["tw_noodle"]:["jp_meat"]};
+$("#out").innerHTML=card("成分表判讀結果","依成分表文字判斷（非物品辨識）",r,txt,top);return Object.assign({},r,{q})}
+function prep(file){return new Promise(ok=>{const im=new Image();im.onload=()=>{try{let k=2000/im.width;k=Math.min(Math.max(k,0.5),3);const w=Math.round(im.width*k),h=Math.round(im.height*k);const c=document.createElement("canvas");c.width=w;c.height=h;const x=c.getContext("2d");x.drawImage(im,0,0,w,h);const d=x.getImageData(0,0,w,h),p=d.data;const hist=new Uint32Array(256);
+for(let i=0;i<p.length;i+=4){const g=(p[i]*.299+p[i+1]*.587+p[i+2]*.114)|0;p[i]=g;hist[g]++}
+let lo=0,hi=255,n=0,cut=w*h*0.01;while(lo<255&&(n+=hist[lo])<cut)lo++;n=0;while(hi>0&&(n+=hist[hi])<cut)hi--;if(hi-lo<20){lo=0;hi=255}const sc=255/(hi-lo);
+for(let i=0;i<p.length;i+=4){const v=Math.max(0,Math.min(255,(p[i]-lo)*sc));p[i]=p[i+1]=p[i+2]=v}x.putImageData(d,0,0);ok(c)}catch(e){ok(file)}};im.onerror=()=>ok(file);im.src=URL.createObjectURL(file)})}
 let tessLoaded=null;function loadTess(){return tessLoaded||(tessLoaded=new Promise((ok,no)=>{const s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";s.onload=ok;s.onerror=()=>{tessLoaded=null;no(new Error("load"))};document.head.appendChild(s)}))}
 async function runOCR(file){const pv=$("#pv");pv.src=URL.createObjectURL(file);pv.classList.remove("hidden");$("#prog").classList.remove("hidden");const bar=$("#prog i"),st=$("#ostat");
 try{st.textContent="載入文字辨識引擎（第一次約需下載 10–20MB，請稍候）…";await loadTess();
-const res=await Tesseract.recognize(file,"jpn+chi_tra+eng",{logger:m=>{if(m.progress!=null){bar.style.width=Math.round(m.progress*100)+"%";st.textContent=(m.status==="recognizing text"?"辨識文字中… ":"準備中… ")+Math.round(m.progress*100)+"%"}}});
-bar.style.width="100%";st.textContent="辨識完成 ✔";ocrResult(res.data.text)}catch(e){st.textContent="辨識失敗，請確認網路連線後再試一次，或改用「搜尋物品」。";console.warn(e)}}
+const img=await prep(file);const res=await Tesseract.recognize(img,"jpn+chi_tra+eng",{logger:m=>{if(m.progress!=null){bar.style.width=Math.round(m.progress*100)+"%";st.textContent=(m.status==="recognizing text"?"辨識文字中… ":"準備中… ")+Math.round(m.progress*100)+"%"}}});
+bar.style.width="100%";st.textContent="辨識完成 ✔";ocrResult(res.data.text,res.data.confidence)}catch(e){st.textContent="辨識失敗，請確認網路連線後再試一次，或改用「搜尋物品」。";console.warn(e)}}
 $("#file").onchange=e=>{const f=e.target.files[0];if(f)runOCR(f)};
 window.__test={search,ocrResult,runOCR};syncDir();
 </script></body></html>
